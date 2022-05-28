@@ -1,31 +1,73 @@
+from turtle import color
 import cv2
 import numpy as np
+import random
 
 
-#img.shape is a 40x40 array with 3 color channels (0,1,2)
-
-image = cv2.imread('testcolors.png')
+image = cv2.imread('testcolors2.png')
 img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-grayscale = cv2.imwrite('grayscale.png',img[:,:,0])
-print(img[:,:,0][0][0] > img[:,:,1][0][0])
+colorizedimg = img.copy()
+gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-def colorize(img):
-    output = np.zeros(image.shape,np.uint8)
-    #convert image to three channels
-    red = img[:,:,0][0]
-    green = img[:,:,1][0]
-    blue = img[:,:,2][0]
-    for i in range(len(red)):
-        #find out which channel in each pixel is strongest and make the other 2 channels 0
-        if red[i] > green[i] and blue[i]:
-            output[:,:,0][i] = red[i]
-            output[:,:,1][i] = 0
-            output[:,:,2][i] = 0
+noiseyimg = np.zeros(image.shape,np.uint8) #.zeros makes an array of 0s, i think .uint8 assigns 8bits per value
+for i in range(img.shape[1]):
+    for j in range(img.shape[0]):
+        rdn = random.random()
+        if rdn < .35:
+            noiseyimg[i][j] = (255,0,0) #blue
+        elif rdn > .65:
+            noiseyimg[i][j] = (0,255,0) #green
+        else:
+            noiseyimg[i][j] = (0,0,255) #red
 
-        #convert image to grayscale, use that value for luminance
-    return output
-colorizedimg = colorize(img)
+
+for i in range(colorizedimg.shape[1]):
+    for j in range(colorizedimg.shape[0]):
+        if noiseyimg[i][j][0] > noiseyimg[i][j][1] and noiseyimg[i][j][0] > noiseyimg[i][j][2]:
+            colorizedimg[i][j][0] = gray[i][j]
+            colorizedimg[i][j][1] = 0
+            colorizedimg[i][j][2] = 0
+        if noiseyimg[i][j][1] > noiseyimg[i][j][0] and noiseyimg[i][j][1] > noiseyimg[i][j][2]:
+            colorizedimg[i][j][1] = gray[i][j]
+            colorizedimg[i][j][0] = 0
+            colorizedimg[i][j][2] = 0
+        if noiseyimg[i][j][2] > noiseyimg[i][j][0] and noiseyimg[i][j][2] > noiseyimg[i][j][1]:
+            colorizedimg[i][j][2] = gray[i][j]
+            colorizedimg[i][j][0] = 0
+            colorizedimg[i][j][1] = 0
+       
+        
+colorizedimg = cv2.cvtColor(colorizedimg, cv2.COLOR_BGR2RGB)
 cv2.imwrite('colorizedimg.png',colorizedimg)
+
+
+        
+#     thres = 1 - prob 
+#     for i in range(image.shape[0]):
+#         for j in range(image.shape[1]):
+#             rdn = random.random()
+#             if rdn < prob:
+#                 output[i][j] = (255,0,0) #blue
+#             elif rdn > thres:
+#                 output[i][j] = (0,255,0) #green
+#             else:
+#                 output[i][j] = (0,0,255) #red
+
+# def colorize(img):
+#     output = np.zeros(image.shape,np.uint8)
+#     print(output)
+#     #convert image to three channels
+#     red = bgr[:,:,0]
+#     green = bgr[:,:,1]
+#     blue = bgr[:,:,2]
+#     for i in range(len(red)):
+
+
+#         #convert image to grayscale, use that value for luminance
+#     return output
+# colorized = colorize(img)
+# colorizedimg = cv2.cvtColor(colorized, cv2.COLOR_BGR2RGB)
+# cv2.imwrite('colorizedimg.png',colorizedimg)
 
 
 
