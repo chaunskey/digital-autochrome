@@ -4,7 +4,7 @@ import numpy as np
 import random
 
 
-image = cv2.imread('testcolors2.png')
+image = cv2.imread('cat2g.png')
 img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 colorizedimg = img.copy()
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
