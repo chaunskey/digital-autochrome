@@ -32,8 +32,10 @@ def sp_noise(image,prob):
                 output[i][j] = (0,0,255) #red
     return output
 image = cv2.imread('gray.png',cv2.IMREAD_COLOR) # Only for grayscale image(?)
-noise_img = sp_noise(image,.3) #add a slider to second argument
+noise_img = sp_noise(image,.35) #add a slider to second argument
 cv2.imwrite('sp_noise.png', noise_img)
+
+#take original RGB value, subtract/add channel value from/with avg of other two
 
 #---add green noise, then blue noise, then red noise
 
