@@ -4,14 +4,14 @@ import numpy as np
 import random
 
 
-image = cv2.imread('cat2g.png')
+image = cv2.imread('cat.png')
 img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 colorizedimg = img.copy()
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
 noiseyimg = np.zeros(image.shape,np.uint8) #.zeros makes an array of 0s, i think .uint8 assigns 8bits per value
-for i in range(img.shape[1]):
-    for j in range(img.shape[0]):
+for i in range(img.shape[0]):
+    for j in range(img.shape[1]):
         rdn = random.random()
         if rdn < .35:
             noiseyimg[i][j] = (255,0,0) #blue
@@ -21,8 +21,8 @@ for i in range(img.shape[1]):
             noiseyimg[i][j] = (0,0,255) #red
 
 
-for i in range(colorizedimg.shape[1]):
-    for j in range(colorizedimg.shape[0]):
+for i in range(colorizedimg.shape[0]):
+    for j in range(colorizedimg.shape[1]):
         if noiseyimg[i][j][0] > noiseyimg[i][j][1] and noiseyimg[i][j][0] > noiseyimg[i][j][2]:
             colorizedimg[i][j][0] = gray[i][j]
             colorizedimg[i][j][1] = 0

@@ -1,47 +1,50 @@
 import numpy as np
 import random
 import cv2
-from PIL import Image, ImageOps, ImageColor
 
-#---import the source image
-srcimg = Image.open('cat.jpg')
-# print(srcimg.size) #shows the dimensions of srcimg as a tuple
+#---import the source image and convert it from BGR to RGB
+image = cv2.imread('cat.png')
+img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
+#---make greyscale version of image for avg'd lumen data
+colorizedimg = img.copy()
+gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-#---make noisey image file, same size as the source file
+#make np array to create RGB noise
+noiseyimg = np.zeros(image.shape,np.uint8) 
+for i in range(img.shape[0]):
+    for j in range(img.shape[1]):
+        rdn = random.random()
+        if rdn < .35:
+            noiseyimg[i][j] = (255,0,0) #blue
+        elif rdn > .65:
+            noiseyimg[i][j] = (0,255,0) #green
+        else:
+            noiseyimg[i][j] = (0,0,255) #red
 
-#use cv2.imread to read the image 
-#i dont think i need to use pillow at all?
-img  = Image.new( mode = "RGB", size = (srcimg.size), color = (100, 100, 100) )
-img.save('gray.png') #png is better than jpg because it doesnt mash the pixels up
-def sp_noise(image,prob):
-    '''
-    Add salt and pepper noise to image
-    prob: Probability of the noise
-    '''
-    output = np.zeros(image.shape,np.uint8) #.zeros makes an array of 0s, i think .uint8 assigns 8bits per value
-    thres = 1 - prob 
-    for i in range(image.shape[0]):
-        for j in range(image.shape[1]):
-            rdn = random.random()
-            if rdn < prob:
-                output[i][j] = (255,0,0) #blue
-            elif rdn > thres:
-                output[i][j] = (0,255,0) #green
-            else:
-                output[i][j] = (0,0,255) #red
-    return output
-image = cv2.imread('gray.png',cv2.IMREAD_COLOR) # Only for grayscale image(?)
-noise_img = sp_noise(image,.35) #add a slider to second argument
-cv2.imwrite('sp_noise.png', noise_img)
+#convert each pixel to noisey image with lumen data from grayscale image
+for i in range(colorizedimg.shape[0]):
+    for j in range(colorizedimg.shape[1]):
+        if noiseyimg[i][j][0] > noiseyimg[i][j][1] and noiseyimg[i][j][0] > noiseyimg[i][j][2]:
+            #red channel
+            colorizedimg[i][j][0] = gray[i][j]
+            colorizedimg[i][j][1] = 0
+            colorizedimg[i][j][2] = 0
+        if noiseyimg[i][j][1] > noiseyimg[i][j][0] and noiseyimg[i][j][1] > noiseyimg[i][j][2]:
+            #green channel
+            colorizedimg[i][j][1] = gray[i][j]
+            colorizedimg[i][j][0] = 0
+            colorizedimg[i][j][2] = 0
+        if noiseyimg[i][j][2] > noiseyimg[i][j][0] and noiseyimg[i][j][2] > noiseyimg[i][j][1]:
+            #blue channel
+            colorizedimg[i][j][2] = gray[i][j]
+            colorizedimg[i][j][0] = 0
+            colorizedimg[i][j][1] = 0
+#need to preserve color data, not just lumen data    
 
-#take original RGB value, subtract/add channel value from/with avg of other two
-
-#---add green noise, then blue noise, then red noise
-
-
-#---parse thru pixels, and assign each pixel the RGB value of according to which color the autochrome noise is
-    #luminance value?
+#convert the output to RGB and write the file
+colorizedimg = cv2.cvtColor(colorizedimg, cv2.COLOR_BGR2RGB)
+cv2.imwrite('colorizedimg.png',colorizedimg)
 
 #---add a function for changing the histogram?
 
